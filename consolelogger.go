@@ -3,7 +3,6 @@ package log4g
 import (
 	"fmt"
 	"os"
-	"time"
 )
 
 func NewConsoleLogger() LoggerStream {
@@ -14,6 +13,6 @@ func NewConsoleLogger() LoggerStream {
 		} else {
 			file = os.Stdout
 		}
-		fmt.Fprintf(file, "%s %s : %v\r\n", time.Now().Format(time.RFC1123), level, values)
+		fmt.Fprintf(file, "%s : %v\r\n", level, values)
 	}
 }
