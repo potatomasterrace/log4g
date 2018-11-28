@@ -60,13 +60,13 @@ func TestInputStream(t *testing.T) {
 func TestDirLogger(t *testing.T) {
 	folderpath := "./testdata/logs/"
 	os.RemoveAll(folderpath)
-	os.Mkdir(folderpath, os.ModePerm)
-	dirLogger := NewDirLogger(folderpath, FileWritingContext{
+	dirLogger, err := NewDirLogger(FileWritingContext{
 		FormatingFunc:    func(v interface{}) string { return fmt.Sprintf("%s", v) },
 		CallDelimiter:    "\r\n",
 		ValuesDelimiters: " , ",
 		Path:             folderpath,
 	})
+	assert.Nil(t, err)
 	loggerFactory := dirLogger.GetLoggerFactory()
 	loggerFactory("file1")
 	fo1 := loggerFactory("file1")

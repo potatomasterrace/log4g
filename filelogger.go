@@ -11,7 +11,6 @@ import (
 type FileWritingContext struct {
 	sync.Mutex
 	File             *os.File
-	PrependTime      string
 	FormatingFunc    func(value interface{}) string
 	LoggerStream     LoggerStream
 	CallDelimiter    string
@@ -115,10 +114,14 @@ func (dirLogger *DirLogger) GetLoggerFactory() LoggerFactory {
 }
 
 // NewDirLogger returns a logger that dispatch topic in a folder files.
-func NewDirLogger(dirPath string, dirContext FileWritingContext) DirLogger {
+func NewDirLogger(dirContext FileWritingContext) (*DirLogger, error) {
+	err := os.Mkdir(dirContext.Path, os.ModePerm)
+	if err != nil {
+		return nil, err
+	}
 	dirLogger := DirLogger{
 		DirContext: dirContext,
 		OpenFiles:  make([]FileWritingContext, 0),
 	}
-	return dirLogger
+	return &dirLogger, nil
 }
