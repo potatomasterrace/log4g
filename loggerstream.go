@@ -9,11 +9,11 @@ import (
 const (
 	FATAL = "[FATAL]"
 	ERROR = "[ERROR]"
-	WARN  = "[WARN]"
-	INFO  = "[INFO]"
+	WARN  = "[WARN] "
+	INFO  = "[INFO] "
 	DEBUG = "[DEBUG]"
 	TRACE = "[TRACE]"
-	ALL   = "[ALL]"
+	ALL   = "[ALL]  "
 )
 
 type LoggerStream func(level string, values ...interface{})
