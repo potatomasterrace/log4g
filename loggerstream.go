@@ -34,17 +34,14 @@ func (ls LoggerStream) Prepend(prependedMsgs ...interface{}) LoggerStream {
 }
 
 func (ls LoggerStream) FunctionCall(args ...interface{}) LoggerStream {
-	// we get the callers as uintptrs - but we just need 1
+	// get Caller name pointer
 	fpcs := make([]uintptr, 1)
-
-	// skip 3 levels to get to the caller of whoever called Caller()
 	runtime.Callers(2, fpcs)
-
-	// get the info of the actual function that's in the pointer
+	// get Caller func
 	fun := runtime.FuncForPC(fpcs[0])
-	// return its name
-	funcName := fmt.Sprintf(" -> %s :", fun.Name())
-	return ls.Prepend(append([]interface{}{funcName}, args...)...)
+	// format func name
+	header := fmt.Sprintf(" -> %s (%v)", fun.Name(), args)
+	return ls.Prepend(header)
 }
 func (ls LoggerStream) Append(appendedMsgs ...interface{}) LoggerStream {
 	return func(level string, values ...interface{}) {
