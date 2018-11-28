@@ -40,7 +40,7 @@ func (ls LoggerStream) FunctionCall(args ...interface{}) LoggerStream {
 	// get Caller func
 	fun := runtime.FuncForPC(fpcs[0])
 	// format func name
-	header := fmt.Sprintf(" -> %s (%v)", fun.Name(), args)
+	header := fmt.Sprintf("- %s %s :", fun.Name(), args)
 	return ls.Prepend(header)
 }
 func (ls LoggerStream) Append(appendedMsgs ...interface{}) LoggerStream {

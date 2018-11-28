@@ -1,6 +1,7 @@
 package log4g
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -33,17 +34,18 @@ func TestLoggerStream(t *testing.T) {
 	loggerStream(ALL, "hello world", "4")
 	expectedCalls := []loggerCall{
 		loggerCall{level: "[ERROR]",
-			values: []interface{}{"Wed, 28 Nov 2018 23:37:19 CET", "prepend", "hello world", "1", "append"}},
+			values: []interface{}{"Wed, 28 Nov 2018 23:42:26 CET", "prepend", "hello world", "1", "append"}},
 		loggerCall{level: "[INFO] ",
-			values: []interface{}{"Wed, 28 Nov 2018 23:37:19 CET", "prepend", "hello world", "2", "append"}},
+			values: []interface{}{"Wed, 28 Nov 2018 23:42:26 CET", "prepend", "hello world", "2", "append"}},
 		loggerCall{level: "[TRACE]",
-			values: []interface{}{"Wed, 28 Nov 2018 23:37:19 CET", "prepend", " -> _/Users/redabourial/Documents/GitHub/log4g.testFunction ([func1Arg2 func1Arg1])", " -> _/Users/redabourial/Documents/GitHub/log4g.testFunction2 ([func2Arg2 func2Arg1])", "hello world", "3", "append"}}}
+			values: []interface{}{"Wed, 28 Nov 2018 23:42:26 CET", "prepend", "- _/Users/redabourial/Documents/GitHub/log4g.testFunction [func1Arg2 func1Arg1] :", "- _/Users/redabourial/Documents/GitHub/log4g.testFunction2 [func2Arg2 func2Arg1] :", "hello world", "3", "append"}}}
+
 	assert.Equal(t, len(expectedCalls), len(loggerCalls))
 	for i, expectedCall := range expectedCalls {
 		assert.Equal(t, expectedCall.level, loggerCalls[i].level)
 		assert.Equal(t, expectedCall.values[1:], loggerCalls[i].values[1:])
 	}
-	// fmt.Printf("\r\n%#v", loggerCalls)
+	fmt.Printf("\r\n%#v", loggerCalls)
 }
 
 func TestLoggerStreamPanicHandle(t *testing.T) {
