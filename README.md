@@ -6,8 +6,6 @@ Current Supported outputs : File and RamBuffer or Console.
 # Usage
 ```Go
 
-
-
 ```
 
 # 

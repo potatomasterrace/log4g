@@ -3,6 +3,7 @@ package log4g
 import (
 	"fmt"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/potatomasterrace/catch"
@@ -40,7 +41,13 @@ func (ls LoggerStream) FunctionCall(args ...interface{}) LoggerStream {
 	// get Caller func
 	fun := runtime.FuncForPC(fpcs[0])
 	// format func name
-	header := fmt.Sprintf("- %s %s :", fun.Name(), args)
+	funcName := fun.Name()
+	if strings.Contains(funcName, ".") {
+		if afterPoint := strings.Split(funcName, ".")[1]; len(afterPoint) > 0 {
+			funcName = afterPoint
+		}
+	}
+	header := fmt.Sprintf("- %s %s :", funcName, args)
 	return ls.Prepend(header)
 }
 func (ls LoggerStream) Append(appendedMsgs ...interface{}) LoggerStream {
