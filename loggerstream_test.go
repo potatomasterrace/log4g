@@ -35,17 +35,17 @@ func TestLoggerStream(t *testing.T) {
 		loggerCall{
 			level: "[ERROR]",
 			values: []interface{}{
-				"Thu, 29 Nov 2018 00:07:06 CET", "prepend", "hello world", "1", "append",
+				"Thu, 29 Nov 2018 00:13:47 CET", "prepend", "hello world", "1", "append",
 			},
 		}, loggerCall{
 			level: "[INFO] ",
 			values: []interface{}{
-				"Thu, 29 Nov 2018 00:07:06 CET", "prepend", "hello world", "2", "append",
+				"Thu, 29 Nov 2018 00:13:47 CET", "prepend", "hello world", "2", "append",
 			},
 		}, loggerCall{
 			level: "[TRACE]",
 			values: []interface{}{
-				"Thu, 29 Nov 2018 00:07:06 CET", "prepend", "- testFunction [func1Arg2 func1Arg1] :", "- testFunction2 [func2Arg2 func2Arg1] :", "hello world", "3", "append",
+				"Thu, 29 Nov 2018 00:13:47 CET", "prepend", " -> testFunction [func1Arg2 func1Arg1] : ", " -> testFunction2 [func2Arg2 func2Arg1] : ", "hello world", "3", "append",
 			},
 		},
 	}
@@ -54,7 +54,7 @@ func TestLoggerStream(t *testing.T) {
 		assert.Equal(t, expectedCall.level, loggerCalls[i].level)
 		assert.Equal(t, expectedCall.values[1:], loggerCalls[i].values[1:])
 	}
-	//	fmt.Printf("\r\n%#v", loggerCalls)
+	//fmt.Printf("\r\n%#v", loggerCalls)
 }
 
 func TestLoggerStreamPanicHandle(t *testing.T) {

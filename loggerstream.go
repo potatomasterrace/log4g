@@ -47,7 +47,7 @@ func (ls LoggerStream) FunctionCall(args ...interface{}) LoggerStream {
 			funcName = afterPoint
 		}
 	}
-	header := fmt.Sprintf("- %s %s :", funcName, args)
+	header := fmt.Sprintf(" -> %s %v : ", funcName, args)
 	return ls.Prepend(header)
 }
 func (ls LoggerStream) Append(appendedMsgs ...interface{}) LoggerStream {
