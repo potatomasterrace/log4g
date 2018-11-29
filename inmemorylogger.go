@@ -8,7 +8,7 @@ import (
 
 type InMemoryLogs [][]interface{}
 
-func (logs InMemoryLogs) toString(valueFormat string, valueDelimiter string, callDelimiter string) string {
+func (logs InMemoryLogs) String(valueFormat string, valueDelimiter string, callDelimiter string) string {
 	var buffer bytes.Buffer
 	for _, logValues := range logs {
 		for _, logValue := range logValues {
