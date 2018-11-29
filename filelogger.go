@@ -24,7 +24,11 @@ func (fwc FileWritingContext) FormatValues(level string, values ...interface{}) 
 	buffer.WriteString(level)
 	for _, value := range values {
 		buffer.WriteString(fwc.ValuesDelimiters)
-		buffer.WriteString(fwc.FormatingFunc(value))
+		if fwc.FormatingFunc == nil {
+			buffer.WriteString(fmt.Sprintf("%s", value))
+		} else {
+			buffer.WriteString(fwc.FormatingFunc(value))
+		}
 	}
 	buffer.WriteString(fwc.CallDelimiter)
 	return buffer.String()
