@@ -8,16 +8,17 @@ import (
 
 type InMemoryLogs [][]interface{}
 
-func (logs InMemoryLogs) String(valueFormat string, valueDelimiter string, callDelimiter string) string {
-	var buffer bytes.Buffer
-	for _, logValues := range logs {
+func (logs InMemoryLogs) StringArray(valueDelimiter string) []string {
+	lines := make([]string, len(logs))
+	for i, logValues := range logs {
+		var buffer bytes.Buffer
 		for _, logValue := range logValues {
-			buffer.WriteString(fmt.Sprintf(valueFormat, logValue))
+			buffer.WriteString(fmt.Sprint(logValue))
 			buffer.WriteString(valueDelimiter)
 		}
-		buffer.WriteString(callDelimiter)
+		lines[i] = buffer.String()
 	}
-	return buffer.String()
+	return lines
 }
 func NewInMemoryLogger() (loggerStream LoggerStream, buffer *InMemoryLogs) {
 	lock := sync.Mutex{}

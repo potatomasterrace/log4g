@@ -42,9 +42,11 @@ func (ls LoggerStream) FunctionCall(args ...interface{}) LoggerStream {
 	fun := runtime.FuncForPC(fpcs[0])
 	// format func name
 	funcName := fun.Name()
+	// Removing filePath
 	if strings.Contains(funcName, ".") {
-		if afterPoint := strings.Split(funcName, ".")[1]; len(afterPoint) > 0 {
-			funcName = afterPoint
+		if nbPoint := strings.Count(funcName, "."); nbPoint > 0 {
+			parts := strings.Split(funcName, ".")[1:]
+			funcName = strings.Join(parts, ".")
 		}
 	}
 	header := fmt.Sprintf(" -> %s %v : ", funcName, args)
