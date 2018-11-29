@@ -22,7 +22,7 @@ func isFactor(n int, f int, logger LoggerStream) bool {
 }
 func isPrime(n int, logger LoggerStream) bool {
 	// Declaring a function call
-	logger := logger.FunCall(n)
+	logger = logger.FunCall(n)
 	squareRoot := int(math.Sqrt(float64(n)))
 	// Logging stuff
 	logger(INFO, "square root", squareRoot)
@@ -79,7 +79,7 @@ The method Prepend prepends values to the logger.
 The new logger will relay the logged values to the old one prepending the prepended values.
 ### Example
 ```Golang
-	logger := logger.Prepend(strs...)
+	logger = logger.Prepend(strs...)
 ```
 ## Prepending Strings 
 The method PrependStrings prepends strings to the logger.
@@ -87,7 +87,7 @@ The method PrependStrings prepends strings to the logger.
 The new logger will relay the logged values to the old one prepending the prepended strings.
 ### Example
 ```Golang
-	logger := logger.Prepend(strs...)
+	logger = logger.Prepend(strs...)
 ```
 ## Appending Values 
 Same thing as Prepending Values but calling method Append.
@@ -101,10 +101,10 @@ The returned method prepends the function call with passed arguments to the logs
 The **calling function name** is added automatically, the arguments need to be passed to be logged.
 ### Example
 ```Golang
-	logger := logger.FunCall(arg1,arg2)
+	logger = logger.FunCall(arg1,arg2)
 ```
 <h3 style="color:orange">Best Practice</h3>
-Always use := when signaling function call and do it at each change of scope to separate the loggers.
+use := when changing scope to separate calls by scope.
 
 Loggers that aren't properly separeted can cause a **memory leak**.
 
@@ -114,7 +114,7 @@ The method WithLock adds a lock to the logger calls.
 The returned logger is concurrency safe.
 ### Example
 ```Golang
-	logger := logger.WithLock()
+	logger = logger.WithLock()
 ```
 ## Making the logger asynchronous
 The method Async makes the logger asynchronous.
@@ -130,9 +130,9 @@ The returned logger is asynchronous.
 		// simply handle it direcly
 		fmt.Println("logger had an unsuspected")
 	}
-	logger := logger.Async(panicHandler)
+	logger = logger.Async(panicHandler)
 	// // to omit logger panics.
-	// logger := logger.Async(nil)
+	// logger = logger.Async(nil)
 ```
 # Defining logger
 ## Using file for logging 
