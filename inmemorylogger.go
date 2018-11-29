@@ -1,10 +1,27 @@
 package log4g
 
-import "sync"
+import (
+	"bytes"
+	"fmt"
+	"sync"
+)
 
-func NewInMemoryLogger() (loggerStream LoggerStream, buffer *[][]interface{}) {
+type InMemoryLogs [][]interface{}
+
+func (logs InMemoryLogs) toString(valueFormat string, valueDelimiter string, callDelimiter string) string {
+	var buffer bytes.Buffer
+	for _, logValues := range logs {
+		for _, logValue := range logValues {
+			buffer.WriteString(fmt.Sprintf(valueFormat, logValue))
+			buffer.WriteString(valueDelimiter)
+		}
+		buffer.WriteString(callDelimiter)
+	}
+	return buffer.String()
+}
+func NewInMemoryLogger() (loggerStream LoggerStream, buffer *InMemoryLogs) {
 	lock := sync.Mutex{}
-	logBuffer := make([][]interface{}, 0)
+	var logBuffer InMemoryLogs = make([][]interface{}, 0)
 	return func(level string, values ...interface{}) {
 		lock.Lock()
 		defer lock.Unlock()
