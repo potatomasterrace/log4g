@@ -12,11 +12,11 @@ type loggerCall struct {
 }
 
 func testFunction2(loggerStream LoggerStream) {
-	loggerStream = loggerStream.FunctionCall("func2Arg2", "func2Arg1")
-	loggerStream(TRACE, "hello world", "3")
+	loggerStream = loggerStream.FunCall("func2Arg2", "func2Arg1")
+	loggerStream(TRACE, "fc1", "fc2")
 }
 func testFunction(loggerStream LoggerStream) {
-	loggerStream = loggerStream.FunctionCall("func1Arg2", "func1Arg1")
+	loggerStream = loggerStream.FunCall("func1Arg2", "func1Arg1")
 	testFunction2(loggerStream)
 }
 func TestLoggerStream(t *testing.T) {
@@ -27,34 +27,23 @@ func TestLoggerStream(t *testing.T) {
 			values: values,
 		})
 	}).PrependTime().Prepend("prepend").Append("append").Filter(ALL)
-	loggerStream(ERROR, "hello world", "1")
-	loggerStream(INFO, "hello world", "2")
+	loggerStream(ERROR, "msg1", "mgs2")
+	loggerStream.AppendString("a2", "a3").PrependString("p1", "p2")(INFO, "msg3", "msg4")
 	testFunction(loggerStream)
-	loggerStream(ALL, "hello world", "4")
+	loggerStream(ALL, "f1", "f2")
 	expectedCalls := []loggerCall{
-		loggerCall{
-			level: "[ERROR]",
-			values: []interface{}{
-				"Thu, 29 Nov 2018 00:13:47 CET", "prepend", "hello world", "1", "append",
-			},
-		}, loggerCall{
-			level: "[INFO] ",
-			values: []interface{}{
-				"Thu, 29 Nov 2018 00:13:47 CET", "prepend", "hello world", "2", "append",
-			},
-		}, loggerCall{
-			level: "[TRACE]",
-			values: []interface{}{
-				"Thu, 29 Nov 2018 00:13:47 CET", "prepend", " -> testFunction [func1Arg2 func1Arg1] : ", " -> testFunction2 [func2Arg2 func2Arg1] : ", "hello world", "3", "append",
-			},
-		},
-	}
+		loggerCall{level: "[ERROR]",
+			values: []interface{}{"Thu, 29 Nov 2018 21:53:07 CET", "prepend", "msg1", "mgs2", "append"}},
+		loggerCall{level: "[INFO] ",
+			values: []interface{}{"Thu, 29 Nov 2018 21:53:07 CET", "prepend", "p1", "p2", "msg3", "msg4", "a2", "a3", "append"}},
+		loggerCall{level: "[TRACE]",
+			values: []interface{}{"Thu, 29 Nov 2018 21:53:07 CET", "prepend", " -> testFunction [func1Arg2 func1Arg1] : ", " -> testFunction2 [func2Arg2 func2Arg1] : ", "fc1", "fc2", "append"}}}
 	assert.Equal(t, len(expectedCalls), len(loggerCalls))
 	for i, expectedCall := range expectedCalls {
 		assert.Equal(t, expectedCall.level, loggerCalls[i].level)
 		assert.Equal(t, expectedCall.values[1:], loggerCalls[i].values[1:])
 	}
-	//fmt.Printf("\r\n%#v", loggerCalls)
+	// fmt.Printf("\r\n%#v", loggerCalls)
 }
 
 func TestLoggerStreamPanicHandle(t *testing.T) {

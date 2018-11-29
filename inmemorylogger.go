@@ -3,11 +3,12 @@ package log4g
 import (
 	"bytes"
 	"fmt"
-	"sync"
 )
 
+// InMemoryLogs is an abstraction for logs in memory
 type InMemoryLogs [][]interface{}
 
+// StringArray transforms the log values to string seperated by valueDelimiter.
 func (logs InMemoryLogs) StringArray(valueDelimiter string) []string {
 	lines := make([]string, len(logs))
 	for i, logValues := range logs {
@@ -20,12 +21,11 @@ func (logs InMemoryLogs) StringArray(valueDelimiter string) []string {
 	}
 	return lines
 }
+
+// NewInMemoryLogger create a logger that outputs values to buffer.
 func NewInMemoryLogger() (loggerStream LoggerStream, buffer *InMemoryLogs) {
-	lock := sync.Mutex{}
 	var logBuffer InMemoryLogs = make([][]interface{}, 0)
 	return func(level string, values ...interface{}) {
-		lock.Lock()
-		defer lock.Unlock()
 		data := append([]interface{}{level}, values...)
 		logBuffer = append(logBuffer, data)
 	}, &logBuffer

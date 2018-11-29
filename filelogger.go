@@ -9,7 +9,6 @@ import (
 
 // FileWritingContext stores the data for writing logged values.
 type FileWritingContext struct {
-	sync.Mutex
 	File             *os.File
 	FormatingFunc    func(value interface{}) string
 	LoggerStream     LoggerStream
@@ -35,45 +34,46 @@ func (fwc FileWritingContext) FormatValues(level string, values ...interface{}) 
 }
 
 // Close the underlying file.
-func (wc *FileWritingContext) Close() error {
-	if wc.File != nil {
-		return wc.File.Close()
-	} else {
-		return fmt.Errorf("trying to close already close log file %s", wc.Path)
+func (fwc *FileWritingContext) Close() error {
+	if fwc.File != nil {
+		return fwc.File.Close()
 	}
-	wc.File = nil
-	return nil
+	fwc.File = nil
+	return fmt.Errorf("trying to close already close log file %s", fwc.Path)
 }
 
-// GetFileLogger returns the logger stream for the file.
-func (wc *FileWritingContext) Init() error {
-	file, err := os.OpenFile(wc.Path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
+// Init initialises the output file.
+func (fwc *FileWritingContext) Init() error {
+	file, err := os.OpenFile(fwc.Path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		return err
 	}
-	wc.File = file
-	lock := sync.Mutex{}
-	wc.LoggerStream = func(level string, values ...interface{}) {
-		byts := wc.FormatValues(level, values...)
-		lock.Lock()
-		defer lock.Unlock()
+	fwc.File = file
+	fwc.LoggerStream = func(level string, values ...interface{}) {
+		byts := fwc.FormatValues(level, values...)
 		_, err := file.WriteString(byts)
 		if err != nil {
 			panic(err)
 		}
 	}
+	// adds a lock for keeping logs consistent.
+	fwc.LoggerStream = fwc.LoggerStream.WithLock()
 	return nil
 }
 
+// DirLogger is a struct for keeping that of files open in the same folder.
 type DirLogger struct {
 	DirContext FileWritingContext
 	OpenFiles  []FileWritingContext
 }
 
+// topicToPath convert a topic to a file path.
 func (dirLogger DirLogger) topicToPath(topic string) string {
 	return fmt.Sprintf("%s/%s", dirLogger.DirContext.Path, topic)
 }
 
+// find returns the open stream for the file.
+// returns nil on file not open.
 func (dirLogger DirLogger) find(topic string) *FileWritingContext {
 	for _, openFile := range dirLogger.OpenFiles {
 		if openFile.Path == dirLogger.topicToPath(topic) {
@@ -83,6 +83,7 @@ func (dirLogger DirLogger) find(topic string) *FileWritingContext {
 	return nil
 }
 
+// Get returns a stream from the
 func (dirLogger *DirLogger) Get(topic string) *FileWritingContext {
 	currentLogger := dirLogger.find(topic)
 	if currentLogger != nil {
@@ -98,18 +99,25 @@ func (dirLogger *DirLogger) Get(topic string) *FileWritingContext {
 	return &fwc
 }
 
-func (dirLogger *DirLogger) Close() error {
-	if dirLogger.OpenFiles == nil || len(dirLogger.OpenFiles) == 0 {
-		return fmt.Errorf("no files to close")
-	}
+// Close the Directory files.
+// Can panic.
+func (dirLogger *DirLogger) Close() {
+	errors := make([]error, 0)
 	for _, openFile := range dirLogger.OpenFiles {
-		openFile.Close()
+		err := openFile.Close()
+		if err != nil {
+			errors = append(errors, err)
+		}
+	}
+	if len(errors) != 0 {
+		panic(errors)
 	}
 	dirLogger.OpenFiles = nil
-	return nil
 }
+
+// GetLoggerFactory opens a directory for writing logs by topic.
 func (dirLogger *DirLogger) GetLoggerFactory() LoggerFactory {
-	lock := sync.Mutex{}
+	lock := &sync.Mutex{}
 	return func(topic string) LoggerStream {
 		lock.Lock()
 		defer lock.Unlock()

@@ -15,14 +15,14 @@ import (
 )
 
 func isFactor(n int, f int, logger LoggerStream) bool {
-	logger = logger.FunctionCall(n, f)
+	logger = logger.FunCall(n, f)
 	isfactor := n%f == 0
 	logger(TRACE, isfactor)
 	return isfactor
 }
 func isPrime(n int, logger LoggerStream) bool {
 	// Declaring a function call
-	logger = logger.FunctionCall(n)
+	logger := logger.FunCall(n)
 	squareRoot := int(math.Sqrt(float64(n)))
 	// Logging stuff
 	logger(INFO, "square root", squareRoot)
@@ -71,7 +71,71 @@ func main() {
 [TRACE] : [Thu, 29 Nov 2018 00:38:11 CET  -> isPrime [103] :   -> isFactor [103 9] :  false]
 [INFO]  : [Thu, 29 Nov 2018 00:38:11 CET  -> isPrime [103] :  is prime]
 ```
-# Using file for logging 
+# Logger
+## Usage
+## Prepending Values 
+The method Prepend prepends values to the logger.
+
+The new logger will relay the logged values to the old one prepending the prepended values.
+### Example
+```Golang
+	logger := logger.Prepend(strs...)
+```
+## Prepending Strings 
+The method PrependStrings prepends strings to the logger.
+
+The new logger will relay the logged values to the old one prepending the prepended strings.
+### Example
+```Golang
+	logger := logger.Prepend(strs...)
+```
+## Appending Values 
+Same thing as Prepending Values but calling method Append.
+## Appending String 
+Same thing as Prepending Strings but calling method AppendString.
+## Logging a function call
+The method FunCall logs a function call.
+
+The returned method prepends the function call with passed arguments to the logs.
+
+The **calling function name** is added automatically, the arguments need to be passed to be logged.
+### Example
+```Golang
+	logger := logger.FunCall(arg1,arg2)
+```
+<h3 style="color:orange">Best Practice</h3>
+Always use := when signaling function call and do it at each change of scope to separate the loggers.
+
+Loggers that aren't properly separeted can cause a **memory leak**.
+
+## Making the logger concurrency safe
+The method WithLock adds a lock to the logger calls.
+
+The returned logger is concurrency safe.
+### Example
+```Golang
+	logger := logger.WithLock()
+```
+## Making the logger asynchronous
+The method Async makes the logger asynchronous.
+
+You can provide a panic handler or nil for omitting logger panics.
+
+The returned logger is asynchronous.
+### Example
+```Golang
+	panicHandler := func (err error){
+		// the error is the output
+		// of recover if not nil 
+		// simply handle it direcly
+		fmt.Println("logger had an unsuspected")
+	}
+	logger := logger.Async(panicHandler)
+	// // to omit logger panics.
+	// logger := logger.Async(nil)
+```
+# Defining logger
+## Using file for logging 
 ``` Go
 	// Getting the logger
 	fwc := FileWritingContext{
@@ -94,7 +158,7 @@ func main() {
     // logger can be used like the quickstart
 	logger := fwc.LoggerStream
 ```
-## Output 
+### Output 
 same data as the quickstart written in file ./logs :
 ```
 [INFO]  Thu, 29 Nov 2018 00:42:16 CET  -> isPrime [41] :  square root %!s(int=6)
@@ -114,8 +178,8 @@ same data as the quickstart written in file ./logs :
 [TRACE] Thu, 29 Nov 2018 00:42:16 CET  -> isPrime [103] :   -> isFactor [103 9] :  %!s(bool=false)
 [INFO]  Thu, 29 Nov 2018 00:42:16 CET  -> isPrime [103] :  is prime 
 ```
-# Using a directory for logging
-## Code 
+## Using a directory for logging
+### Code 
 ```Golang
 	// Create the LoggerFactory
 	folderpath := "./logs"
@@ -132,13 +196,13 @@ same data as the quickstart written in file ./logs :
     // this logger writes to ./logs/file2
 	logger2 := loggerFactory("file2")
 ```
-# Using ram for logging
+## Using ram for logging
 ```Golang
 	logger,buffer:= NewInMemoryLogger()
 	// buffer is type *[][]interface{} and contains all the logged data.
 ```
 
-# Intercept panic called inside logger
+## Intercept panic called inside logger
 Call method No Panic of the logger
 ```Golang 
 	level := WARN

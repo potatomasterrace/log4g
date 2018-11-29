@@ -24,7 +24,6 @@ func TestConsoleLogger(t *testing.T) {
 			io.Copy(&buf, r)
 			outC <- buf.String()
 		}()
-		
 
 		// back to normal state
 		w.Close()

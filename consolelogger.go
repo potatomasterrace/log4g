@@ -5,6 +5,7 @@ import (
 	"os"
 )
 
+// NewConsoleLogger creates a Logger that outputs to console.
 func NewConsoleLogger() LoggerStream {
 	return func(level string, values ...interface{}) {
 		var file *os.File

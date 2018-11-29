@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/potatomasterrace/catch"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -48,12 +50,16 @@ func TestInputStream(t *testing.T) {
 	})
 	t.Run("inputstream", func(t *testing.T) {
 		is, err := NewFileInput(path)
+		is = is.WithLock()
 		assert.Nil(t, err)
 		lines := make([]string, 0)
 		for line := is(); line != nil; line = is() {
 			lines = append(lines, *line)
 		}
 		assert.Equal(t, []string{"hello | world | 1", "world | hello | 2", "hello | world | 3"}, lines)
+		is = nil
+		_, err = is.NoPanic()
+		assert.NotNil(t, err)
 	})
 }
 
@@ -79,10 +85,14 @@ func TestDirLogger(t *testing.T) {
 		fo2("foo", "2")
 	})
 	t.Run("Closing", func(t *testing.T) {
-		// closing file
-		err := dirLogger.Close()
+		err := catch.Error(dirLogger.Close)
 		assert.Nil(t, err)
-		err = dirLogger.Close()
+		dirLogger.OpenFiles = []FileWritingContext{
+			FileWritingContext{
+				Path: "unexisting",
+			},
+		}
+		err = catch.Error(dirLogger.Close)
 		assert.NotNil(t, err)
 	})
 	t.Run("error handling", func(t *testing.T) {
