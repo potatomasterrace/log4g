@@ -141,7 +141,8 @@ The returned logger is asynchronous.
 	fwc := FileWritingContext{
         // FilePath
 		Path:             "./logs"
-        // Function called to convert a value to string
+		// Function called to convert a value to string
+		// Defaults to fmt.Sprint(v) if field empty
 		FormatingFunc: func(v interface{}) string {
 			return fmt.Sprintf("%s", v)
         },
