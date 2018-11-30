@@ -14,13 +14,13 @@ import (
 	. "github.com/potatomasterrace/log4g"
 )
 
-func isFactor(n int, f int, logger LoggerStream) bool {
+func isFactor(n int, f int, logger Logger) bool {
 	logger = logger.FunCall(n, f)
 	isfactor := n%f == 0
 	logger(TRACE, isfactor)
 	return isfactor
 }
-func isPrime(n int, logger LoggerStream) bool {
+func isPrime(n int, logger Logger) bool {
 	// Declaring a function call
 	logger = logger.FunCall(n)
 	squareRoot := int(math.Sqrt(float64(n)))
@@ -150,14 +150,14 @@ The returned logger is asynchronous.
 		CallDelimiter:    "\r\n",
         // Value to separate between function args
         ValuesDelimiters: " ",}
-    // Initializes the LoggerStream
+    // Initializes the Logger
 	err := fwc.Init()
 	defer fwc.Close()
 	if err != nil {
 		panic(err)
     }
     // logger can be used like the quickstart
-	logger := fwc.LoggerStream
+	logger := fwc.Logger
 ```
 ### Output 
 same data as the quickstart written in file ./logs :

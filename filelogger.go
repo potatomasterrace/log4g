@@ -11,7 +11,7 @@ import (
 type FileWritingContext struct {
 	File             *os.File
 	FormatingFunc    func(value interface{}) string
-	LoggerStream     LoggerStream
+	Logger           Logger
 	CallDelimiter    string
 	ValuesDelimiters string
 	Path             string
@@ -49,7 +49,7 @@ func (fwc *FileWritingContext) Init() error {
 		return err
 	}
 	fwc.File = file
-	fwc.LoggerStream = func(level string, values ...interface{}) {
+	fwc.Logger = func(level string, values ...interface{}) {
 		byts := fwc.FormatValues(level, values...)
 		_, err := file.WriteString(byts)
 		if err != nil {
@@ -57,7 +57,7 @@ func (fwc *FileWritingContext) Init() error {
 		}
 	}
 	// adds a lock for keeping logs consistent.
-	fwc.LoggerStream = fwc.LoggerStream.WithLock()
+	fwc.Logger = fwc.Logger.WithLock()
 	return nil
 }
 
@@ -118,10 +118,10 @@ func (dirLogger *DirLogger) Close() {
 // GetLoggerFactory opens a directory for writing logs by topic.
 func (dirLogger *DirLogger) GetLoggerFactory() LoggerFactory {
 	lock := &sync.Mutex{}
-	return func(topic string) LoggerStream {
+	return func(topic string) Logger {
 		lock.Lock()
 		defer lock.Unlock()
-		return dirLogger.Get(topic).LoggerStream
+		return dirLogger.Get(topic).Logger
 	}
 }
 

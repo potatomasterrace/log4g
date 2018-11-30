@@ -6,7 +6,7 @@ import (
 )
 
 // NewConsoleLogger creates a Logger that outputs to console.
-func NewConsoleLogger() LoggerStream {
+func NewConsoleLogger() Logger {
 	return func(level string, values ...interface{}) {
 		var file *os.File
 		if level == FATAL || level == ERROR {

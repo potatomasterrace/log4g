@@ -23,7 +23,7 @@ func (logs InMemoryLogs) StringArray(valueDelimiter string) []string {
 }
 
 // NewInMemoryLogger create a logger that outputs values to buffer.
-func NewInMemoryLogger() (loggerStream LoggerStream, buffer *InMemoryLogs) {
+func NewInMemoryLogger() (Logger Logger, buffer *InMemoryLogs) {
 	var logBuffer InMemoryLogs = make([][]interface{}, 0)
 	return func(level string, values ...interface{}) {
 		data := append([]interface{}{level}, values...)

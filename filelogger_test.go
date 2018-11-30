@@ -27,7 +27,7 @@ func TestInputStream(t *testing.T) {
 			err := fwc.Init()
 			assert.Nil(t, err)
 		})
-		fo := fwc.LoggerStream
+		fo := fwc.Logger
 		// stays opens
 		t.Run("writing", func(t *testing.T) {
 			fo("hello", "world", "1")

@@ -7,9 +7,9 @@ import (
 )
 
 func TestInMemoryLogger(t *testing.T) {
-	loggerStream, buffer := NewInMemoryLogger()
-	loggerStream.PrependTime()(WARN, "hello", "1")
-	loggerStream(TRACE, "world", "2")
+	Logger, buffer := NewInMemoryLogger()
+	Logger.PrependTime()(WARN, "hello", "1")
+	Logger(TRACE, "world", "2")
 	loggedLines := buffer.StringArray(" ")
 	assert.Equal(t, len(loggedLines), 2)
 	assert.Contains(t, loggedLines[0], "[WARN]  ")

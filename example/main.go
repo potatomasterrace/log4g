@@ -6,13 +6,13 @@ import (
 	. "github.com/potatomasterrace/log4g"
 )
 
-func isFactor(n int, f int, logger LoggerStream) bool {
+func isFactor(n int, f int, logger Logger) bool {
 	logger = logger.FunCall(n, f)
 	isfactor := n%f == 0
 	logger(TRACE, isfactor)
 	return isfactor
 }
-func isPrime(n int, logger LoggerStream) bool {
+func isPrime(n int, logger Logger) bool {
 	// Declaring a function call
 	logger = logger.FunCall(n)
 	squareRoot := int(math.Sqrt(float64(n)))
