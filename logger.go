@@ -84,6 +84,26 @@ func (ls Logger) FunCall(args ...interface{}) Logger {
 	return ls.Prepend(header)
 }
 
+// DetailedFunCall Provide the arguments to log as parameters.
+func (ls Logger) DetailedFunCall(args ...interface{}) Logger {
+	// get Caller name pointer
+	fpcs := make([]uintptr, 1)
+	runtime.Callers(2, fpcs)
+	// get Caller func
+	fun := runtime.FuncForPC(fpcs[0])
+	// format func name
+	funcName := fun.Name()
+	// Removing filePath
+	if strings.Contains(funcName, ".") {
+		if nbPoint := strings.Count(funcName, "."); nbPoint > 0 {
+			parts := strings.Split(funcName, ".")[1:]
+			funcName = strings.Join(parts, ".")
+		}
+	}
+	header := fmt.Sprintf(" -> %s %v %d : ", funcName, args, fun.Entry())
+	return ls.Prepend(header)
+}
+
 // Append values to the logger.
 func (ls Logger) Append(appendedValues ...interface{}) Logger {
 	return func(level string, values ...interface{}) {
