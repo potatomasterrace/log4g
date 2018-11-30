@@ -38,6 +38,14 @@ func (ls Logger) PrependTime() Logger {
 	}
 }
 
+// PrependGoRoutines prepends the current number of running goroutines.
+func (ls Logger) PrependGoRoutines() Logger {
+	return func(level string, values ...interface{}) {
+		msg := fmt.Sprint("[ Go routines :", runtime.NumGoroutine(), "]")
+		ls(level, append([]interface{}{msg}, values...)...)
+	}
+}
+
 // Prepend the values of loggint to the logger.
 func (ls Logger) Prepend(prependValues ...interface{}) Logger {
 	return func(level string, values ...interface{}) {

@@ -197,15 +197,21 @@ same data as the quickstart written in file ./logs :
 	logger1 := loggerFactory("file1")
     // this logger writes to ./logs/file2
 	logger2 := loggerFactory("file2")
+	// alternatively call
+	perLevellogger := loggerFactory.Logger()
+	// This call will be written to loggerFactory("TRACE")
+	perLevellogger(TRACE,"hello")
 ```
 ## Using ram for logging
 ```Golang
 	logger,buffer:= NewInMemoryLogger()
 	// buffer is type *[][]interface{} and contains all the logged data.
+	// Formating buffer to string
+	// valueDelim := " "
+	// var logs []string = buffer.StringArray(valueDelim)
 ```
-
-## Intercept panic called inside logger
-Call method No Panic of the logger
+## Intercept a panic inside logger
+The method NoPanic intercepts returns the arg of a panic.
 ```Golang 
 	level := WARN
 	msgs := []interface{}{
