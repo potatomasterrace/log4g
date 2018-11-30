@@ -147,3 +147,10 @@ func (lf LoggerFactory) NoPanic(topic string) (LoggerStream, error) {
 		})
 	return loggerStream, err
 }
+
+// NoPanic intercept an eventual panic and returns it as an error.
+func (lf LoggerFactory) LoggerStream() LoggerStream {
+	return func(level string, values ...interface{}) {
+		lf(level)(level, values...)
+	}
+}
