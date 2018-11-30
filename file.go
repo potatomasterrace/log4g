@@ -9,9 +9,9 @@ import (
 
 // FileWritingContext stores the data for writing logged values.
 type FileWritingContext struct {
+	Logger
 	File             *os.File
 	FormatingFunc    func(value interface{}) string
-	Logger           Logger
 	CallDelimiter    string
 	ValuesDelimiters string
 	Path             string

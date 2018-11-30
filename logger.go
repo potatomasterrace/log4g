@@ -27,6 +27,12 @@ const (
 	ALL = "[ALL]  "
 )
 
+func GetMockLogger() Logger {
+	return func(level string, values ...interface{}) {
+		return
+	}
+}
+
 // Logger is an abstract logger.
 type Logger func(level string, values ...interface{})
 
