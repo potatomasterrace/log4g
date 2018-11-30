@@ -136,7 +136,7 @@ The returned logger is asynchronous.
 	// logger = logger.Async(nil)
 ```
 # Defining logger
-## Using file for logging 
+## Using a file for logging 
 ``` Go
 	// Getting the logger
 	fwc := FileWritingContext{
