@@ -74,15 +74,17 @@ func TestDirLogger(t *testing.T) {
 	})
 	assert.Nil(t, err)
 	loggerFactory := dirLogger.GetLoggerFactory()
+	// doesn't panic on multiple access
 	loggerFactory("file1")
 	fo1 := loggerFactory("file1")
 	fo2 := loggerFactory("file2")
-	// stays opens
 	t.Run("writing", func(t *testing.T) {
 		fo1("hello", "world", "1")
-		fo1("foo", "1")
 		fo2("hello", "world", "2")
-		fo2("foo", "2")
+	})
+	t.Run("writing as logger", func(t *testing.T) {
+		loggerFactory.Logger()("file1", "foo", "1")
+		loggerFactory.Logger()("file2", "foo", "2")
 	})
 	t.Run("Closing", func(t *testing.T) {
 		err := catch.Error(dirLogger.Close)
@@ -108,7 +110,7 @@ func TestDirLogger(t *testing.T) {
 			for line := is(); line != nil; line = is() {
 				lines = append(lines, *line)
 			}
-			assert.Equal(t, []string{"hello , world , 1", "foo , 1"}, lines)
+			assert.Equal(t, []string{"hello , world , 1", "file1 , foo , 1"}, lines)
 		})
 		t.Run("file2", func(t *testing.T) {
 			is, err := NewFileInput("./testdata/logs/file2")
@@ -117,7 +119,7 @@ func TestDirLogger(t *testing.T) {
 			for line := is(); line != nil; line = is() {
 				lines = append(lines, *line)
 			}
-			assert.Equal(t, []string{"hello , world , 2", "foo , 2"}, lines)
+			assert.Equal(t, []string{"hello , world , 2", "file2 , foo , 2"}, lines)
 		})
 	})
 

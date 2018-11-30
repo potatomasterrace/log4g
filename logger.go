@@ -148,7 +148,7 @@ func (lf LoggerFactory) NoPanic(topic string) (Logger, error) {
 	return Logger, err
 }
 
-// NoPanic intercept an eventual panic and returns it as an error.
+// Logger transforms a logger factory to logger.
 func (lf LoggerFactory) Logger() Logger {
 	return func(level string, values ...interface{}) {
 		lf(level)(level, values...)
