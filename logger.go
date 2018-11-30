@@ -27,8 +27,8 @@ const (
 	ALL = "[ALL]  "
 )
 
-// GetMockLogger returns a mock of a logger.
-func GetMockLogger() Logger {
+// MockLogger returns a mock of a logger.
+func MockLogger() Logger {
 	return func(level string, values ...interface{}) {
 		return
 	}
