@@ -73,6 +73,21 @@ func main() {
 ```
 # Logger
 ## Usage
+## Logging a function call
+The method FunCall logs a function call.
+
+The returned method prepends the function call with passed arguments to the logs.
+
+The **calling function name** is added automatically, the arguments need to be passed to be logged.
+### Example
+```Golang
+	logger = logger.FunCall(arg1,arg2)
+```
+<h3 style="color:orange">Best Practice</h3>
+use := when changing scope to separate calls by scope.
+
+Loggers that aren't properly separeted can cause a **memory leak**.
+
 ## Prepending Values 
 The method Prepend prepends values to the logger.
 
@@ -93,20 +108,6 @@ The new logger will relay the logged values to the old one prepending the prepen
 Same thing as Prepending Values but calling method Append.
 ## Appending String 
 Same thing as Prepending Strings but calling method AppendString.
-## Logging a function call
-The method FunCall logs a function call.
-
-The returned method prepends the function call with passed arguments to the logs.
-
-The **calling function name** is added automatically, the arguments need to be passed to be logged.
-### Example
-```Golang
-	logger = logger.FunCall(arg1,arg2)
-```
-<h3 style="color:orange">Best Practice</h3>
-use := when changing scope to separate calls by scope.
-
-Loggers that aren't properly separeted can cause a **memory leak**.
 
 ## Making the logger concurrency safe
 The method WithLock adds a lock to the logger calls.
