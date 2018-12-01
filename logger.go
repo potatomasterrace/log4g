@@ -10,23 +10,6 @@ import (
 	"github.com/potatomasterrace/catch"
 )
 
-const (
-	// FATAL logging level
-	FATAL = "[FATAL]"
-	// ERROR logging level
-	ERROR = "[ERROR]"
-	// WARN logging level
-	WARN = "[WARN] "
-	// INFO logging level
-	INFO = "[INFO] "
-	// DEBUG logging level
-	DEBUG = "[DEBUG]"
-	// TRACE logging level
-	TRACE = "[TRACE]"
-	// ALL logging level
-	ALL = "[ALL]  "
-)
-
 // MockLogger returns a mock of a logger.
 func MockLogger() Logger {
 	return func(level string, values ...interface{}) {
@@ -188,4 +171,43 @@ func (lf LoggerFactory) Logger() Logger {
 	return func(level string, values ...interface{}) {
 		lf(level)(level, values...)
 	}
+}
+
+const (
+	// FATAL logging level
+	FATAL = "[FATAL]"
+	// ERROR logging level
+	ERROR = "[ERROR]"
+	// WARN logging level
+	WARN = "[WARN] "
+	// INFO logging level
+	INFO = "[INFO] "
+	// DEBUG logging level
+	DEBUG = "[DEBUG]"
+	// TRACE logging level
+	TRACE = "[TRACE]"
+	// ALL logging level
+	ALL = "[ALL]  "
+)
+
+func (logger Logger) Fatal(values ...interface{}) {
+	logger(FATAL, values...)
+}
+func (logger Logger) Error(values ...interface{}) {
+	logger(ERROR, values...)
+}
+func (logger Logger) Warn(values ...interface{}) {
+	logger(WARN, values...)
+}
+func (logger Logger) Info(values ...interface{}) {
+	logger(INFO, values...)
+}
+func (logger Logger) Debug(values ...interface{}) {
+	logger(DEBUG, values...)
+}
+func (logger Logger) Trace(values ...interface{}) {
+	logger(TRACE, values...)
+}
+func (logger Logger) ALL(values ...interface{}) {
+	logger(ALL, values...)
 }
