@@ -21,41 +21,41 @@ func MockLogger() Logger {
 type Logger func(level string, values ...interface{})
 
 // PrependTime prepends the time of calls to the logger.
-func (ls Logger) PrependTime() Logger {
+func (logger Logger) PrependTime() Logger {
 	return func(level string, values ...interface{}) {
 		time := time.Now().Format(time.RFC1123)
-		ls(level, append([]interface{}{time}, values...)...)
+		logger(level, append([]interface{}{time}, values...)...)
 	}
 }
 
 // PrependGoRoutines prepends the current number of running goroutines.
-func (ls Logger) PrependGoRoutines() Logger {
+func (logger Logger) PrependGoRoutines() Logger {
 	return func(level string, values ...interface{}) {
 		msg := fmt.Sprint("[ Go routines : ", runtime.NumGoroutine(), "]")
-		ls(level, append([]interface{}{msg}, values...)...)
+		logger(level, append([]interface{}{msg}, values...)...)
 	}
 }
 
 // Prepend the values of loggint to the logger.
-func (ls Logger) Prepend(prependValues ...interface{}) Logger {
+func (logger Logger) Prepend(prependValues ...interface{}) Logger {
 	return func(level string, values ...interface{}) {
-		ls(level, append(prependValues, values...)...)
+		logger(level, append(prependValues, values...)...)
 	}
 }
 
 // PrependString the strings to the logger.
-func (ls Logger) PrependString(prependedMsgs ...string) Logger {
+func (logger Logger) PrependString(prependedMsgs ...string) Logger {
 	prependedValues := make([]interface{}, len(prependedMsgs))
 	for i := range prependedMsgs {
 		prependedValues[i] = prependedMsgs[i]
 	}
-	return ls.Prepend(prependedValues...)
+	return logger.Prepend(prependedValues...)
 }
 
 // FunCall prepend the function call info to the logger.
 // The function name is prepended automatically.
 // Provide the arguments to log as parameters.
-func (ls Logger) FunCall(args ...interface{}) Logger {
+func (logger Logger) FunCall(args ...interface{}) Logger {
 	// get Caller name pointer
 	fpcs := make([]uintptr, 1)
 	runtime.Callers(2, fpcs)
@@ -71,11 +71,11 @@ func (ls Logger) FunCall(args ...interface{}) Logger {
 		}
 	}
 	header := fmt.Sprintf(" -> %s %v : ", funcName, args)
-	return ls.Prepend(header)
+	return logger.Prepend(header)
 }
 
 // DetailedFunCall Provide the arguments to log as parameters.
-func (ls Logger) DetailedFunCall(args ...interface{}) Logger {
+func (logger Logger) DetailedFunCall(args ...interface{}) Logger {
 	// get Caller name pointer
 	fpcs := make([]uintptr, 1)
 	runtime.Callers(2, fpcs)
@@ -91,59 +91,59 @@ func (ls Logger) DetailedFunCall(args ...interface{}) Logger {
 		}
 	}
 	header := fmt.Sprintf(" -> %s %v %d : ", funcName, args, fun.Entry())
-	return ls.Prepend(header)
+	return logger.Prepend(header)
 }
 
 // Append values to the logger.
-func (ls Logger) Append(appendedValues ...interface{}) Logger {
+func (logger Logger) Append(appendedValues ...interface{}) Logger {
 	return func(level string, values ...interface{}) {
-		ls(level, append(values, appendedValues...)...)
+		logger(level, append(values, appendedValues...)...)
 	}
 }
 
 // AppendString append strings to the logger.
-func (ls Logger) AppendString(appendedMsgs ...string) Logger {
+func (logger Logger) AppendString(appendedMsgs ...string) Logger {
 	appendedValues := make([]interface{}, len(appendedMsgs))
 	for i := range appendedMsgs {
 		appendedValues[i] = appendedMsgs[i]
 	}
-	return ls.Append(appendedValues...)
+	return logger.Append(appendedValues...)
 }
 
 // NoPanic intercept an eventual panic and returns it as an error.
-func (ls Logger) NoPanic(level string, values ...interface{}) error {
+func (logger Logger) NoPanic(level string, values ...interface{}) error {
 	return catch.Error(func() {
-		ls(level, values...)
+		logger(level, values...)
 	})
 }
 
 // Filter the logging level.
-func (ls Logger) Filter(filteredLevels ...string) Logger {
+func (logger Logger) Filter(filteredLevels ...string) Logger {
 	return func(level string, values ...interface{}) {
 		for _, filteredLevel := range filteredLevels {
 			if filteredLevel == level {
 				return
 			}
 		}
-		ls(level, values...)
+		logger(level, values...)
 	}
 }
 
 // WithLock adds a lock for concurrent writes.
-func (ls Logger) WithLock() Logger {
+func (logger Logger) WithLock() Logger {
 	lock := &sync.Mutex{}
 	return func(level string, values ...interface{}) {
 		lock.Lock()
 		defer lock.Unlock()
-		ls(level, values...)
+		logger(level, values...)
 	}
 }
 
 // Async makes the logger asynchronous
-func (ls Logger) Async(errorHandler func(error)) Logger {
+func (logger Logger) Async(errorHandler func(error)) Logger {
 	return func(level string, values ...interface{}) {
 		go func() {
-			err := ls.NoPanic(level, values...)
+			err := logger.NoPanic(level, values...)
 			if err != nil && errorHandler != nil {
 				catch.Interface(func() {
 					errorHandler(err)
@@ -190,26 +190,40 @@ const (
 	ALL = "[ALL]  "
 )
 
+// LoggerStream is an abstraction for logging to a level
 type LoggerStream func(values ...interface{})
 
+// Fatal is pretty self explanatory and repetitive
 func (logger Logger) Fatal(values ...interface{}) {
 	logger(FATAL, values...)
 }
+
+// Error repetetive did you say ?
 func (logger Logger) Error(values ...interface{}) {
 	logger(ERROR, values...)
 }
+
+// Warn really, how repetitive ?
 func (logger Logger) Warn(values ...interface{}) {
 	logger(WARN, values...)
 }
+
+// Info not enough to keep me from writing non-sense
 func (logger Logger) Info(values ...interface{}) {
 	logger(INFO, values...)
 }
+
+// Debug just to avoid warnings
 func (logger Logger) Debug(values ...interface{}) {
 	logger(DEBUG, values...)
 }
+
+// Trace now this is getting boring
 func (logger Logger) Trace(values ...interface{}) {
 	logger(TRACE, values...)
 }
-func (logger Logger) ALL(values ...interface{}) {
+
+// All and that's all !
+func (logger Logger) All(values ...interface{}) {
 	logger(ALL, values...)
 }
