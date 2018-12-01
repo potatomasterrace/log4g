@@ -190,6 +190,8 @@ const (
 	ALL = "[ALL]  "
 )
 
+type LoggerStream func(values ...interface{})
+
 func (logger Logger) Fatal(values ...interface{}) {
 	logger(FATAL, values...)
 }
