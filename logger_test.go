@@ -1,7 +1,10 @@
 package log4g
 
 import (
+	"fmt"
+	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -52,6 +55,24 @@ func TestAsync(t *testing.T) {
 	}
 	Logger(nil).Async(panicHandler)
 	Logger(nil).Async(nil)
+}
+func TestWithLock(t *testing.T) {
+	start := time.Now()
+	waitime := 100
+	logger := Logger(func(string, ...interface{}) {
+		time.Sleep(1 * time.Millisecond)
+	}).WithLock()
+	var wg sync.WaitGroup
+	wg.Add(waitime)
+	for i := 0; i < waitime; i++ {
+		go func() {
+			defer wg.Done()
+			logger(INFO, i)
+		}()
+	}
+	wg.Wait()
+	fmt.Println(time.Now().Sub(start))
+	assert.True(t, time.Now().Sub(start) > time.Duration(waitime)*time.Millisecond)
 }
 func TestLoggerPanicHandle(t *testing.T) {
 	Logger := Logger(nil)

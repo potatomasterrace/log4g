@@ -10,15 +10,15 @@ import (
 	"github.com/potatomasterrace/catch"
 )
 
+// Logger is an abstract logger.
+type Logger func(level string, values ...interface{})
+
 // MockLogger returns a mock of a logger.
-func MockLogger() Logger {
+func T() Logger {
 	return func(level string, values ...interface{}) {
 		return
 	}
 }
-
-// Logger is an abstract logger.
-type Logger func(level string, values ...interface{})
 
 // PrependTime prepends the time of calls to the logger.
 func (logger Logger) PrependTime() Logger {
@@ -31,7 +31,7 @@ func (logger Logger) PrependTime() Logger {
 // PrependGoRoutines prepends the current number of running goroutines.
 func (logger Logger) PrependGoRoutines() Logger {
 	return func(level string, values ...interface{}) {
-		msg := fmt.Sprint("[ Go routines : ", runtime.NumGoroutine(), "]")
+		msg := fmt.Sprint("[ Go routines : ", runtime.NumGoroutine(), " ]")
 		logger(level, append([]interface{}{msg}, values...)...)
 	}
 }
@@ -41,6 +41,15 @@ func (logger Logger) Prepend(prependValues ...interface{}) Logger {
 	return func(level string, values ...interface{}) {
 		logger(level, append(prependValues, values...)...)
 	}
+}
+
+// AppendString append strings to the logger.
+func (logger Logger) D(appendedMsgs ...string) Logger {
+	appendedValues := make([]interface{}, len(appendedMsgs))
+	for i := range appendedMsgs {
+		appendedValues[i] = appendedMsgs[i]
+	}
+	return logger.Append(appendedValues...)
 }
 
 // PrependString the strings to the logger.
