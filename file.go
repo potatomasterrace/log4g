@@ -1,6 +1,7 @@
 package log4g
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"os"
@@ -49,9 +50,10 @@ func (fwc *FileWritingContext) Init() error {
 		return err
 	}
 	fwc.File = file
+	writer := bufio.NewWriter(file)
 	fwc.Logger = func(level string, values ...interface{}) {
 		byts := fwc.FormatValues(level, values...)
-		_, err := file.WriteString(byts)
+		_, err := writer.WriteString(byts)
 		if err != nil {
 			panic(err)
 		}
