@@ -12,6 +12,7 @@ import (
 type FileWritingContext struct {
 	Logger
 	File             *os.File
+	writer           *bufio.Writer
 	FormatingFunc    func(value interface{}) string
 	CallDelimiter    string
 	ValuesDelimiters string
@@ -37,8 +38,10 @@ func (fwc FileWritingContext) FormatValues(level string, values ...interface{}) 
 // Close the underlying file.
 func (fwc *FileWritingContext) Close() error {
 	if fwc.File != nil {
+		fwc.writer.Flush()
 		return fwc.File.Close()
 	}
+	fwc.writer = nil
 	fwc.File = nil
 	return fmt.Errorf("trying to close already close log file %s", fwc.Path)
 }
@@ -51,6 +54,7 @@ func (fwc *FileWritingContext) Init() error {
 	}
 	fwc.File = file
 	writer := bufio.NewWriter(file)
+	fwc.writer = writer
 	fwc.Logger = func(level string, values ...interface{}) {
 		byts := fwc.FormatValues(level, values...)
 		_, err := writer.WriteString(byts)
