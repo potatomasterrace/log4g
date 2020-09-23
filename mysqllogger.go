@@ -1,3 +1,0 @@
-package log4g
-
-
