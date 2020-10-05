@@ -37,13 +37,14 @@ func (fwc FileWritingContext) FormatValues(level string, values ...interface{}) 
 
 // Close the underlying file.
 func (fwc *FileWritingContext) Close() error {
-	if fwc.File != nil {
-		fwc.writer.Flush()
-		return fwc.File.Close()
+	if fwc.writer == nil || fwc.File == nil {
+		return fmt.Errorf("trying to close already close log file %s", fwc.Path)
 	}
+	fwc.writer.Flush()
+	err := fwc.File.Close()
 	fwc.writer = nil
 	fwc.File = nil
-	return fmt.Errorf("trying to close already close log file %s", fwc.Path)
+	return err
 }
 
 // Init initialises the output file.
@@ -53,11 +54,14 @@ func (fwc *FileWritingContext) Init() error {
 		return err
 	}
 	fwc.File = file
-	writer := bufio.NewWriter(file)
-	fwc.writer = writer
+	fwc.writer = bufio.NewWriter(file)
 	fwc.Logger = func(level string, values ...interface{}) {
 		byts := fwc.FormatValues(level, values...)
-		_, err := writer.WriteString(byts)
+		_, err := fwc.writer.WriteString(byts)
+		if err != nil {
+			panic(err)
+		}
+		err = fwc.writer.Flush()
 		if err != nil {
 			panic(err)
 		}
@@ -89,7 +93,7 @@ func (dirLogger DirLogger) find(topic string) *FileWritingContext {
 	return nil
 }
 
-// Get returns a stream from the
+// Get return a filewritingcontext generating filename from the topic.
 func (dirLogger *DirLogger) Get(topic string) *FileWritingContext {
 	currentLogger := dirLogger.find(topic)
 	if currentLogger != nil {
@@ -107,7 +111,7 @@ func (dirLogger *DirLogger) Get(topic string) *FileWritingContext {
 
 // Close the Directory files.
 // Can panic.
-func (dirLogger *DirLogger) Close() {
+func (dirLogger *DirLogger) Close() []error {
 	errors := make([]error, 0)
 	for _, openFile := range dirLogger.OpenFiles {
 		err := openFile.Close()
@@ -115,10 +119,8 @@ func (dirLogger *DirLogger) Close() {
 			errors = append(errors, err)
 		}
 	}
-	if len(errors) != 0 {
-		panic(errors)
-	}
 	dirLogger.OpenFiles = nil
+	return errors
 }
 
 // GetLoggerFactory opens a directory for writing logs by topic.

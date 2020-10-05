@@ -43,15 +43,6 @@ func (logger Logger) Prepend(prependValues ...interface{}) Logger {
 	}
 }
 
-// AppendString append strings to the logger.
-func (logger Logger) D(appendedMsgs ...string) Logger {
-	appendedValues := make([]interface{}, len(appendedMsgs))
-	for i := range appendedMsgs {
-		appendedValues[i] = appendedMsgs[i]
-	}
-	return logger.Append(appendedValues...)
-}
-
 // PrependString the strings to the logger.
 func (logger Logger) PrependString(prependedMsgs ...string) Logger {
 	prependedValues := make([]interface{}, len(prependedMsgs))
@@ -121,9 +112,10 @@ func (logger Logger) AppendString(appendedMsgs ...string) Logger {
 
 // NoPanic intercept an eventual panic and returns it as an error.
 func (logger Logger) NoPanic(level string, values ...interface{}) error {
-	return catch.Error(func() {
+	err := catch.Error(func() {
 		logger(level, values...)
 	})
+	return err
 }
 
 // Filter the logging level.

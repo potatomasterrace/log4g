@@ -4,9 +4,6 @@ import (
 	"fmt"
 	"os"
 	"testing"
-	"time"
-
-	"github.com/potatomasterrace/catch"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -29,24 +26,17 @@ func TestInputStream(t *testing.T) {
 		})
 		fo := fwc.Logger
 		// stays opens
-		t.Run("writing", func(t *testing.T) {
-			fo("hello", "world", "1")
-			fo.Prepend("hello")("world", "2")
-			err := fo.NoPanic("hello", "world", "3")
-			assert.Nil(t, err)
-		})
-		t.Run("Closing", func(t *testing.T) {
-			// closing file
-			err := fwc.Close()
-			assert.Nil(t, err)
-			err = fwc.Close()
-			assert.NotNil(t, err)
-		})
-		t.Run("error handling", func(t *testing.T) {
-			time.Sleep(200 * time.Millisecond)
-			err := fo.NoPanic("hello", "world", "4")
-			assert.NotNil(t, err)
-		})
+		fo("hello", "world", "1")
+		fo.Prepend("hello")("world", "2")
+		err := fo.NoPanic("hello", "world", "3")
+		assert.Nil(t, err)
+		// closing file
+		err = fwc.Close()
+		assert.Nil(t, err)
+		err = fwc.Close()
+		assert.NotNil(t, err)
+		err = fo.NoPanic("hello", "world", "4")
+		assert.NotNil(t, err)
 	})
 	t.Run("inputstream", func(t *testing.T) {
 		is, err := NewFileInput(path)
@@ -78,30 +68,21 @@ func TestDirLogger(t *testing.T) {
 	loggerFactory("file1")
 	fo1 := loggerFactory("file1")
 	fo2 := loggerFactory("file2")
-	t.Run("writing", func(t *testing.T) {
-		fo1("hello", "world", "1")
-		fo2("hello", "world", "2")
-	})
-	t.Run("writing as logger", func(t *testing.T) {
-		loggerFactory.Logger()("file1", "foo", "1")
-		loggerFactory.Logger()("file2", "foo", "2")
-	})
-	t.Run("Closing", func(t *testing.T) {
-		err := catch.Error(dirLogger.Close)
-		assert.Nil(t, err)
-		dirLogger.OpenFiles = []FileWritingContext{
-			FileWritingContext{
-				Path: "unexisting",
-			},
-		}
-		err = catch.Error(dirLogger.Close)
-		assert.NotNil(t, err)
-	})
-	t.Run("error handling", func(t *testing.T) {
-		time.Sleep(200 * time.Millisecond)
-		err := fo1.NoPanic("hello", "world", "4")
-		assert.NotNil(t, err)
-	})
+	fo1("hello", "world", "1")
+	fo2("hello", "world", "2")
+	loggerFactory.Logger()("file1", "foo", "1")
+	loggerFactory.Logger()("file2", "foo", "2")
+	errs := dirLogger.Close()
+	assert.Equal(t, len(errs), 0)
+	dirLogger.OpenFiles = []FileWritingContext{
+		FileWritingContext{
+			Path: "unexisting",
+		},
+	}
+	errs = dirLogger.Close()
+	assert.Equal(t, len(errs), 1)
+	err = fo1.NoPanic("hello", "world", "4")
+	assert.NotNil(t, err)
 	t.Run("inputstream", func(t *testing.T) {
 		t.Run("file1", func(t *testing.T) {
 			is, err := NewFileInput("./testdata/logs/file1")
